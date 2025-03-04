@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+// import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { v4 as uuidv4 } from "uuid";
 import Background from "../components/Backgroud";
@@ -27,10 +27,22 @@ const Home = () => {
   // すべてのオブジェクトのrefを格納するリスト
   const objectRefs = useRef<Map<string, DraggableObject>>(new Map());
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [isDragging, setIsDragging] = useState(false); // ドラッグ状態を管理
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_isDragging, setIsDragging] = useState(false); // ドラッグ状態を管理
+  const [isModalOpen, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    console.log("周期表を開くボタンが押された");
+    setOpen(true);
+  };
+  const handleClose = () => {
+    console.log("周期表を閉じる");
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    console.log("isModalOpen の値:", isModalOpen);
+  }, [isModalOpen]);
 
   // アイテム追加ボタンがクリックされたときのオブジェクトを追加
   const handleAddItem = useCallback((type: ObjectType) => {
@@ -68,7 +80,7 @@ const Home = () => {
     const newType = getCollisionResult(symbolA, symbolB);
     if (newType === null) return;
 
-    const newPosition = objA.position.clone().lerp(objB.position, 0.5); // ✅ 先に `position` を取得
+    const newPosition = objA.position.clone().lerp(objB.position, 0.5); // 先に `position` を取得
     objectRefs.current.delete(idA);
     objectRefs.current.delete(idB);
 
@@ -91,10 +103,10 @@ const Home = () => {
     setSelectedItems((prev) => [
       ...prev.filter((id) => id !== idA && id !== idB),
       newId,
-    ]); // ✅ 配列順を明示
+    ]); // 配列順を明示
   };
   useEffect(() => {
-    setSelectedItems(Array.from(objectRefs.current.keys())); // ✅ `objectRefs` を `selectedItems` に同期
+    setSelectedItems(Array.from(objectRefs.current.keys())); // `objectRefs` を `selectedItems` に同期
   }, []);
 
   const renderObjects = useMemo(() => {
@@ -129,7 +141,7 @@ const Home = () => {
   return (
     // 画面いっぱいにCanvasが表示されるようdivでラップしている
     <div style={{ width: "100vw", height: "100vh" }}>
-      <Canvas>
+      <Canvas camera={{ position: [0, 5, 10] }}>
         <ambientLight />
         <pointLight position={[100, 10, 10]} />
         {/* 環境光 */}
@@ -158,14 +170,13 @@ const Home = () => {
           shadow-mapSize={[1024, 1024]}
         />
         {/* カメラ制御 */}
-        <OrbitControls enabled={!isDragging} />
+        {/* <OrbitControls enabled={!isDragging} /> */}
         <ambientLight intensity={0.5} />
         <directionalLight castShadow position={[0, 20, 20]} intensity={2} />
-        {/* 背景 (しかし、作られてないので、作る必要あり) */}
         <Background />
         {renderObjects}
         {/* <ExplosionEffect position={new THREE.Vector3(0, 0, 0)} /> */}
-        <FreeCamera isDragging={isDragging} /> {/* ✅ カメラ操作を追加 */}
+        <FreeCamera isModalOpen={isModalOpen} />
       </Canvas>
 
       <Box
@@ -178,7 +189,7 @@ const Home = () => {
         }}
       >
         <Button
-          variant='contained'
+          variant="contained"
           onClick={handleOpen}
           sx={{
             fontSize: "1.4rem",
@@ -189,10 +200,10 @@ const Home = () => {
       </Box>
 
       <Modal
-        open={open}
+        open={isModalOpen}
         onClose={handleClose}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
         <Box
           width={"70%"}
