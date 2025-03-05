@@ -14,7 +14,7 @@ import DraggableSphere from "../components/DraggableSphere";
 import { DraggableObject, ObjectType } from "../types/types";
 import { getCollisionResult } from "../utils/collisionRules";
 import FreeCamera from "../components/FreeCamera";
-import PeriodicTable from "../components/PeriodicTable";
+import PeriodicTable from "../components/the_periodic_table/periodic-table";
 import Button from "@mui/material/Button";
 import { Box, Modal } from "@mui/material";
 import ExplosionEffect from "../components/ExplosionEffect";
